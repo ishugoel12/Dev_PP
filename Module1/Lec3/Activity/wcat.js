@@ -4,6 +4,16 @@
 [3],[4],...=> any other arguments you pass while running the file
 */
 
+/*
+string function => string_name.startsWith("blah"), return true/false
+*/
+
+/*
+array function => array_name.indexOf(array_element), return element index
+*/
+
+// return statement returns undefined, if not specified.
+
 const fs = require("fs");
 
 // get flag functions

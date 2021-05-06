@@ -1,3 +1,9 @@
+/*
+fs.existsSync(file) => checks for existence of file
+
+fs.readFileSync(file) => returns file contents
+*/
+
 const fs = require("fs");
 
 // get contents from the files and check if any invalid file passed
@@ -79,7 +85,7 @@ let nFlag = function (data)
 }
 
 //if we declare module.exports like this, the key name and value are same, ie it works
-    module.exports = {
+module.exports = {
     getFileContent,
     sFlag,
     bFlag,
