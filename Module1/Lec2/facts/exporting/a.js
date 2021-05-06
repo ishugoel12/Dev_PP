@@ -6,8 +6,8 @@ let school = "kiit";
 //if you want to *use school, clg in other file*
 //module.export is an empty object that every js file has
 //in next line, you add key 'school' to module.exports and assign it the value of variable school
-module.exports.schol = school;
-module.exports.clppg = clg;
+module.exports.school = school;
+module.exports.clg = clg;
 
 //now it has => 
 // module.exports = {
