@@ -11,13 +11,13 @@ module.exports = getAllMatchLink;
 
 function compute(html)
 {
-    let mydoc = cheerio.load(html);
-    let allATag = mydoc('a[data-hover="Scorecard"]');
+    let mydoc = cheerio.load(html);     // all match consolidated scorecard html
+    let allATag = mydoc('a[data-hover="Scorecard"]');   //all a tags to single match scorecard pages
     console.log(allATag.length);
     for(let i=0 ; i<allATag.length ; i++)
     {
-        let matchLink = "https://www.espncricinfo.com" + mydoc(allATag[i]).attr("href");
+        let matchLink = "https://www.espncricinfo.com" + mydoc(allATag[i]).attr("href");    //complete link
         // console.log(matchLink);
-        matchdata(matchLink);
+        matchdata(matchLink);   //send these links of individual match pages to batsman.js
     }
 }
