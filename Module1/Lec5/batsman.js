@@ -2,6 +2,7 @@
 
 const request = require("request");
 const cheerio = require("cheerio");
+const fs = require("fs");
 
 function matchdata(matchLink)
 {
@@ -17,11 +18,11 @@ function matchprocess(html)
     let mydoc = cheerio.load(html);     //single match page html
     let bothTable = mydoc(".table.batsman");
     // CAN ALSO REFER SUSHANT SIR's FILE FOR LITTLE DIFFERENT APPROACH
-    let teamname = mydoc(".Collapsible .header-title.label");   //or ".Collapsible h5"      // both h5 tags with team names 
+    let tn = mydoc(".Collapsible .header-title.label");   //or ".Collapsible h5"      // both h5 tags with team names 
     for(let i=0 ; i<bothTable.length ; i++)
     {
-        let tn = mydoc(teamname[i]).text().split(" INNINGS ");  //to extract just the team name, not extra - "INNINGS (TARGET: 157 RUNS FROM 20 OVERS)"
-        console.log("TEAM => " + tn[0].trim());
+        let teamName = mydoc(tn[i]).text().split(" INNINGS ")[0].trim();  //to extract just the team name, not extra - "INNINGS (TARGET: 157 RUNS FROM 20 OVERS)"
+        console.log("TEAM => " + teamName);
         let tablei = mydoc(bothTable[i]);
         let allRows = tablei.find("tbody tr");
         for(let j=0 ; j<allRows.length ; j+=2)
@@ -29,15 +30,80 @@ function matchprocess(html)
             let allTds = mydoc(allRows[j]).find("td");
             if (allTds.length > 4)   // 4 to ignore last Extras row. it has 4 tds    //OR allTds.length > 1 and run the j loop for j<allRows.length-1 to ignore last row
             {
-                let name = mydoc(allTds[0]).text();
+                let playerName = mydoc(allTds[0]).text();
                 let runs = mydoc(allTds[2]).text();
                 let balls = mydoc(allTds[3]).text();
                 let four = mydoc(allTds[5]).text();
                 let sixes =  mydoc(allTds[6]).text();
                 let strikerate = mydoc(allTds[7]).text();
-                console.log("Batsman = " + name + "   " + "Runs = " + runs + "   " +"Balls = " + balls + "   " + "Fours = " + four + "   " + "Sixes = " + sixes + "   " + "Strike Rate = " + strikerate);
+                // console.log("Batsman = " + name + "   " + "Runs = " + runs + "   " +"Balls = " + balls + "   " + "Fours = " + four + "   " + "Sixes = " + sixes + "   " + "Strike Rate = " + strikerate);
+                processDetails(teamName, playerName, runs, balls, four, sixes, strikerate);
             }
         }
     }
     console.log("##############################################");
+}
+
+function processDetails(teamName, playerName, runs, balls, four, sixes, strikerate)
+{
+    if(teamFolderExists(teamName)){
+        if (playerFileExists(teamName, playerName)){
+            updateFile(teamName, playerName, runs, balls, four, sixes, strikerate);
+        }
+        else{
+            createPlayerFile(teamName, playerName, runs, balls, four, sixes, strikerate);
+        }
+    }
+    else{
+        createTeamFolder(teamName);
+        createPlayerFile(teamName, playerName, runs, balls, four, sixes, strikerate);
+    }
+}
+
+function teamFolderExists(teamName)
+{
+    let teamFolder = "./IPL/"+teamName;
+    return fs.existsSync(teamFolder);
+}
+function createTeamFolder(teamName)
+{
+    let teamFolder = "./IPL/" + teamName;
+    fs.mkdirSync(teamFolder);
+}
+function playerFileExists(teamName, playerName)
+{
+    let playerFile = "./IPL/" + teamName + "/" + playerName + ".json";
+    return fs.existsSync(playerFile);
+}
+function createPlayerFile(teamName, playerName, runs, balls, four, sixes, strikerate)
+{
+    let playerFile = "./IPL/" + teamName + "/" + playerName + ".json";
+    let file = [];  //since out reqd file format is object of each innings in an array
+    let inning = {
+        Name : playerName,
+        Runs : runs,
+        Balls : balls,
+        Fours : four,
+        Sixes : sixes,
+        StrikeRate : strikerate
+    };
+    file.push(inning);  //push in array
+    let jsonObj = JSON.stringify(file);
+    fs.writeFileSync(playerFile , jsonObj);
+}
+function updateFile(teamName, playerName, runs, balls, four, sixes, strikerate)
+{
+    let playerFile = "./IPL/" + teamName + "/" + playerName + ".json";
+    let file = JSON.parse(fs.readFileSync(playerFile));
+    let inning = {
+        Name: playerName,
+        Runs: runs,
+        Balls: balls,
+        Fours: four,
+        Sixes: sixes,
+        StrikeRate: strikerate
+    };
+    file.push(inning);
+    let jsonObj = JSON.stringify(file);
+    fs.writeFileSync(playerFile, jsonObj);
 }
