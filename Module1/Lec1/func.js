@@ -15,7 +15,7 @@ sayHi();
 
 
 //global execution context
-//1. memory allocation phase => any variable gets undefined func_name get function body
+//1. memory allocation phase => any variable gets undefined, func_name get function body
 //2. code execution phase  => variable gets its value (var a=10), since func_name has the code by now, where ever you call it, it doesn't 
 //matter, it will execute
 //in case of var=func(), not same
@@ -30,7 +30,7 @@ say();
 
 
 //callback thing
-//high order func => accpets function as argument
+//high order func => accepts function as argument
 //callback function => which is passed as an argument in other func
 function argument(){
     console.log("hello there");

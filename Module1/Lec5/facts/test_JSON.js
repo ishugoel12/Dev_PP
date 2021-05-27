@@ -1,5 +1,5 @@
 // JSON => javascript object notation, either object or collection of objects in an array
-//jsonObjectWhichCanBeWrittenInJsonFile =  JSON.stringify(object or array of objects)   (js -> json)
+//json-Object-Which-Can-Be-Written-In-Json-File =  JSON.stringify(object or array of objects)   (js -> json)
 // object = JSON.parse(read data from json file)    //convert json object into readble format for js    (json -> js)
 
 let fs = require("fs");

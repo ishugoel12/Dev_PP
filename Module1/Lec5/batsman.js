@@ -3,6 +3,7 @@
 const request = require("request");
 const cheerio = require("cheerio");
 const fs = require("fs");
+const json2xls = require("json2xls");
 
 function matchdata(matchLink)
 {
@@ -37,14 +38,15 @@ function matchprocess(html)
                 let sixes =  mydoc(allTds[6]).text();
                 let strikerate = mydoc(allTds[7]).text();
                 // console.log("Batsman = " + name + "   " + "Runs = " + runs + "   " +"Balls = " + balls + "   " + "Fours = " + four + "   " + "Sixes = " + sixes + "   " + "Strike Rate = " + strikerate);
-                processDetails(teamName, playerName, runs, balls, four, sixes, strikerate);
+                processDetailsfs(teamName, playerName, runs, balls, four, sixes, strikerate);
+                processDetailsxls(teamName, playerName, runs, balls, four, sixes, strikerate);
             }
         }
     }
     console.log("##############################################");
 }
 
-function processDetails(teamName, playerName, runs, balls, four, sixes, strikerate)
+function processDetailsfs(teamName, playerName, runs, balls, four, sixes, strikerate)
 {
     if(teamFolderExists(teamName)){
         if (playerFileExists(teamName, playerName)){
@@ -106,4 +108,62 @@ function updateFile(teamName, playerName, runs, balls, four, sixes, strikerate)
     file.push(inning);
     let jsonObj = JSON.stringify(file);
     fs.writeFileSync(playerFile, jsonObj);
+}
+
+
+function processDetailsxls(teamName, playerName, runs, balls, four, sixes, strikerate)
+{
+    if (teamFolderExistsxls(teamName)){
+        if (playerFileExistsxls(teamName, playerName)){
+            updateFilexls(teamName, playerName, runs, balls, four, sixes, strikerate);
+        }
+        else{
+            createPlayerFilexls(teamName, playerName, runs, balls, four, sixes, strikerate);
+        }
+    }
+    else{
+        createTeamFolderxls(teamName);
+        createPlayerFilexls(teamName, playerName, runs, balls, four, sixes, strikerate);
+    }
+}
+
+function teamFolderExistsxls(teamName) {
+    let teamFolder = "./IPL xls/" + teamName;
+    return fs.existsSync(teamFolder);
+}
+function createTeamFolderxls(teamName) {
+    let teamFolder = "./IPL xls/" + teamName;
+    fs.mkdirSync(teamFolder);
+}
+function playerFileExistsxls(teamName, playerName) {
+    let playerFile = "./IPL xls/" + teamName + "/" + playerName + ".xlsx";
+    return fs.existsSync(playerFile);
+}
+function createPlayerFilexls(teamName, playerName, runs, balls, four, sixes, strikerate) {
+    let playerFile = "./IPL xls/" + teamName + "/" + playerName + ".xlsx";
+    let obj = [];  //since out reqd file format is object of each innings in an array
+    let inning = {
+        Name: playerName,
+        Runs: runs,
+        Balls: balls,
+        Fours: four,
+        Sixes: sixes,
+        StrikeRate: strikerate
+    };
+    obj.push(inning);  //push in array
+    fs.writeFileSync(playerFile, json2xls(obj), "binary");
+}
+function updateFilexls(teamName, playerName, runs, balls, four, sixes, strikerate) {
+    let playerFile = "./IPL xls/" + teamName + "/" + playerName + ".xlsx";
+    let file = JSON.parse(fs.readFileSync(playerFile));
+    let inning = {
+        Name: playerName,
+        Runs: runs,
+        Balls: balls,
+        Fours: four,
+        Sixes: sixes,
+        StrikeRate: strikerate
+    };
+    file.push(inning);
+    fs.writeFileSync(playerFile, json2xls(obj), "binary");
 }

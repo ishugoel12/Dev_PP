@@ -2,6 +2,8 @@
 fs.existsSync(file) => checks for existence of file
 
 fs.readFileSync(file) => returns file contents
+
+console.log(__dirname) => current directory path (here, till activity)
 */
 
 const fs = require("fs");
